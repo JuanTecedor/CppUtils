@@ -1,3 +1,6 @@
+#ifndef MATH_HPP
+#define MATH_HPP
+
 #include <limits>
 #include <cmath>
 
@@ -9,3 +12,5 @@ template <typename T>
     else
         return false;
 }
+
+#endif
