@@ -4,6 +4,8 @@
 #include <array>
 #include <cmath>
 #include <cassert>
+#include <algorithm>
+#include <numeric>
 
 template<typename T, std::size_t SIZE> requires (SIZE > 0)
 class VectorContainer {
@@ -31,12 +33,11 @@ public:
 
     template<typename U>
     constexpr static VectorContainer fromCast(const VectorContainer<U, SIZE> & other) noexcept {
-        VectorContainer<T, SIZE> v;
-        for(std::size_t i = 0; i < SIZE; ++i)
-        {
-            v[i] = static_cast<T>(other[i]);
-        }
-        return v;
+        VectorContainer<T, SIZE> result;
+        std::transform(other.begin(), other.end(), result.begin(), [](const auto & element){
+            return static_cast<U>(element);
+        });
+        return result;
     }
 
     template <typename U, typename S>
@@ -70,36 +71,74 @@ public:
         return m_data[i];
     }
 
-    // [[nodiscard]] constexpr VectorContainer<T, SIZE> operator+(const VectorContainer<T, SIZE> & rhs) const noexcept;
+    [[nodiscard]] constexpr VectorContainer<T, SIZE> operator+(const VectorContainer<T, SIZE> & rhs) const noexcept {
+        VectorContainer<T, SIZE> result;
+        std::transform(begin(), end(), rhs.begin(), result.begin(), std::plus<T>());
+        return result;
+    }
 
-    // [[nodiscard]] constexpr VectorContainer<T, SIZE> operator-(const VectorContainer<T, SIZE> & rhs) const noexcept;
+    [[nodiscard]] constexpr VectorContainer<T, SIZE> operator-(const VectorContainer<T, SIZE> & rhs) const noexcept {
+        VectorContainer<T, SIZE> result;
+        std::transform(begin(), end(), rhs.begin(), result.begin(), std::minus<T>());
+        return result;
+    }
 
-    // [[nodiscard]] constexpr VectorContainer<T, SIZE> operator-() const noexcept;
+    [[nodiscard]] constexpr VectorContainer<T, SIZE> operator-() const noexcept {
+        VectorContainer<T, SIZE> result;
+        std::transform(begin(), end(), result.begin(), std::negate<T>());
+        return result;
+    }
 
-    // template <typename U>
-    // [[nodiscard]] constexpr VectorContainer<T, SIZE> operator*(const U & scalar) const noexcept;
+    template <typename U> requires (std::integral<U> or std::floating_point<U>)
+    [[nodiscard]] constexpr VectorContainer<T, SIZE> operator*(const U & scalar) const noexcept {
+        VectorContainer<T, SIZE> result;
+        std::transform(begin(), end(), result.begin(), [scalar](const auto & element){
+            return element * scalar;
+        });
+        return result;
+    }
 
-    // [[nodiscard]] constexpr T operator*(const VectorContainer<T, SIZE> & rhs) const noexcept;
+    [[nodiscard]] constexpr T operator*(const VectorContainer<T, SIZE> & rhs) const noexcept {
+        return std::inner_product(begin(), end(), rhs.begin(), T{});
+    }
 
-    // template <typename U>
-    // [[nodiscard]] constexpr VectorContainer<T, SIZE> operator/(const U & scalar) const noexcept;
+    template <typename U>
+    [[nodiscard]] constexpr VectorContainer<T, SIZE> operator/(const U & scalar) const noexcept {
+        VectorContainer<T, SIZE> result;
+        std::transform(begin(), end(), result.begin(), [scalar](const auto & element){
+            return element / scalar;
+        });
+        return result;
+    }
 
-    // constexpr VectorContainer<T, SIZE> operator+=(const VectorContainer<T, SIZE> & rhs) noexcept;
+    constexpr VectorContainer<T, SIZE> operator+=(const VectorContainer<T, SIZE> & rhs) noexcept {
+        std::transform(begin(), end(), rhs.begin(), begin(), std::plus<T>());
+        return *this;
+    }
 
-    // constexpr VectorContainer<T, SIZE> operator-=(const VectorContainer<T, SIZE> & rhs) noexcept;
+    constexpr VectorContainer<T, SIZE> operator-=(const VectorContainer<T, SIZE> & rhs) noexcept {
+        std::transform(begin(), end(), rhs.begin(), begin(), std::minus<T>());
+        return *this;
+    }
 
-    // template <typename U>
-    // constexpr VectorContainer<T, SIZE> operator*=(const U & scalar) noexcept;
+    template <typename U>
+    constexpr VectorContainer<T, SIZE> operator*=(const U & scalar) noexcept {
+        *this = *this * scalar;
+        return *this;
+    }
 
-    // template <typename U>
-    // constexpr VectorContainer<T, SIZE> operator/=(const U & scalar) noexcept;
+    template <typename U>
+    constexpr VectorContainer<T, SIZE> operator/=(const U & scalar) noexcept {
+        *this = *this / scalar;
+        return *this;
+    }
 
     [[nodiscard]] constexpr bool operator==(const VectorContainer<T, SIZE> & rhs) const noexcept {
         return m_data == rhs.m_data;
     }
 
-    template<typename U>
-    [[nodiscard]] constexpr bool equals(const VectorContainer<T, SIZE> & rhs, const U & epsilon) const noexcept;
+    // template<typename U>
+    // [[nodiscard]] constexpr bool equals(const VectorContainer<T, SIZE> & rhs, const U & epsilon) const noexcept;
 
     iterator begin() noexcept {
         return m_data.begin();
