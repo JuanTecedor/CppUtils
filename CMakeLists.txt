@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.22)
 
-project(Vector VERSION 0.0.0 LANGUAGES CXX)
+project(CppUtils VERSION 0.0.0 LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 20)
 
@@ -8,8 +8,8 @@ find_package(Catch2 3 REQUIRED)
 
 add_executable(
     ${PROJECT_NAME}
-    src/Vector.hpp
-    tests/testVector.cpp
+    src/Vector.hpp src/Math.hpp
+    tests/testVector.cpp tests/testMath.cpp
 )
 
 target_link_libraries(${PROJECT_NAME} PRIVATE Catch2::Catch2WithMain)

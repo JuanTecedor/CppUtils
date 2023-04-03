@@ -1,5 +1,5 @@
-#ifndef VECTOR_CONTAINER_HPP
-#define VECTOR_CONTAINER_HPP
+#ifndef VECTOR_HPP
+#define VECTOR_HPP
 
 #include <array>
 #include <cmath>
@@ -162,25 +162,6 @@ public:
 
 private:
     std::array<T, SIZE> m_data;
-
-    constexpr T & getX() noexcept {
-        return m_data[0];
-    }
-
-    constexpr T & getY() noexcept {
-        assert(SIZE > 1);
-        return m_data[0];
-    }
-
-    constexpr T & getZ() noexcept {
-        if constexpr(SIZE > 2) {
-            return m_data[2];
-        }
-        else {
-            assert(false);
-            return m_data[2];
-        }
-    }
 };
 
 template <typename T, std::size_t SIZE>
@@ -209,4 +190,4 @@ using Vector3i = Vector3<int>;
 using Vector3u = Vector3<unsigned int>;
 using Vector3f = Vector3<float>;
 
-#endif // VECTOR_CONTAINER_HPP
+#endif // VECTOR_HPP
