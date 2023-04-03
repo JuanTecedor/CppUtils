@@ -12,14 +12,7 @@ jobs:
       - name: Apt get
         run: |
           sudo apt-get install gcc git cmake -y
-      - name: Cache Catch2
-        id: cache-catch2
-        uses: actions/cache@v3
-        with:
-          path: usr/local/include/catch2
-          key: catch2
       - name: Get Catch2
-        if: steps.cache-catch2.outputs.cache-hit != 'true'
         run: |
           git clone https://github.com/catchorg/Catch2.git
           cd Catch2
