@@ -2,6 +2,7 @@
 #include <numbers>
 
 #include <catch2/catch_test_macros.hpp>
+#include <catch2/matchers/catch_matchers_floating_point.hpp>
 
 #include "../src/Vector.hpp"
 
@@ -20,6 +21,7 @@ TEST_CASE("Test Vector Constructors") {
     REQUIRE(Vector2i::fromAngleAndLength(0, 1) == Vector2i{1, 0});
     REQUIRE(Vector2i::fromAngleAndLength(std::numbers::pi_v<float>, 1) == Vector2i{-1, 0});
     REQUIRE(Vector2i::fromAngleAndLength(std::numbers::pi_v<float> / 2, 1) == Vector2i{0, 1});
+    Vector2i a = Vector2i::fromAngleAndLength(std::numbers::pi_v<float> * (3.f / 2), 1);
     REQUIRE(Vector2i::fromAngleAndLength(std::numbers::pi_v<float> * (3.f / 2), 1) == Vector2i{0, -1});
 }
 
@@ -74,4 +76,29 @@ TEST_CASE("Test Vector Assignment Operators") {
     Vector2i v4{8, -10};
     v4 /= -2;
     REQUIRE(v4 == Vector2i{-4, 5});
+}
+
+TEST_CASE("Test Vector Length Operations") {
+    using Catch::Matchers::WithinRel;
+    Vector2i v1{5, 1};
+    REQUIRE(v1.lengthSquared() == 26);
+    REQUIRE(v1.length() == 5);
+
+    Vector3i v2{5, 1, -6};
+    REQUIRE(v2.lengthSquared() == 62);
+    REQUIRE(v2.length() == 7);
+
+    Vector3f v3{10.f, -20.f, 30.f};
+    Vector3f normalized = v3.normalized();
+    REQUIRE_THAT(normalized.length(), WithinRel(1.f));
+    REQUIRE_THAT(normalized[0], WithinRel(0.2672612419124244f));
+    REQUIRE_THAT(normalized[1], WithinRel(-0.5345224838248488f));
+    REQUIRE_THAT(normalized[2], WithinRel(0.8017837257372731f));
+}
+
+TEST_CASE("Test Vector Angle") {
+    using Catch::Matchers::WithinRel;
+    Vector3f v1{3.f, 0.f, -1.f};
+    Vector3f v2{6.f, 6.f, -1.f};
+    REQUIRE_THAT(v1.angle(v2), WithinRel(std::numbers::pi_v<float> / 4, .01f));
 }

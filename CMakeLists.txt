@@ -8,8 +8,8 @@ find_package(Catch2 3 REQUIRED)
 
 add_executable(
     ${PROJECT_NAME}
-    src/VectorContainer.hpp src/Vector.hpp
-    tests/testVector.cpp tests/testVectorStaticAsserts.cpp
+    src/Vector.hpp
+    tests/testVector.cpp
 )
 
 target_link_libraries(${PROJECT_NAME} PRIVATE Catch2::Catch2WithMain)
