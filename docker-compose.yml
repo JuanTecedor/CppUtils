@@ -1,0 +1,13 @@
+version: '3'
+
+services:
+  cpp_utils:
+    container_name: cpp_utils
+    stdin_open: true
+    tty: true
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - .:/cpp_utils
+    restart: "no"
