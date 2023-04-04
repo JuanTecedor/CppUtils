@@ -4,23 +4,21 @@
 #include <unordered_map>
 #include <stack>
 
-#include "SlotMapInterface.hpp"
-
 template <typename VALUE_TYPE, typename KEY_TYPE = std::size_t>
-class UnorderedMapSlotMap : public SlotMapInterface<VALUE_TYPE> {
+class UnorderedMapSlotMap {
 public:
-    using value_type = SlotMapInterface<VALUE_TYPE>::value_type;
-    using key_type = SlotMapInterface<VALUE_TYPE>::key_type;
+    using value_type = VALUE_TYPE;
+    using key_type = KEY_TYPE;
 
     [[nodiscard]] constexpr auto size() const noexcept {
         return m_data.size();
     }
 
-    [[nodiscard]] constexpr auto & get(const auto & key) noexcept {
+    [[nodiscard]] constexpr value_type & get(const key_type & key) noexcept {
         return m_data[key];
     }
 
-    [[nodiscard]] constexpr auto get(const auto & key) const noexcept {
+    [[nodiscard]] constexpr value_type get(const key_type & key) const noexcept {
         return m_data[key];
     }
 
@@ -57,7 +55,7 @@ public:
         return m_data.cend();
     }
 
-    constexpr static void clear() noexcept {
+    constexpr void clear() noexcept {
         m_data.clear();
         current_key = 0;
         key_stack = {};

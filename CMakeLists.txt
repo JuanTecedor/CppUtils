@@ -8,7 +8,7 @@ find_package(Catch2 3 REQUIRED)
 
 add_executable(
     ${PROJECT_NAME}
-    src/Vector.hpp src/Math.hpp src/ecs/SlotMapInterface.hpp src/ecs/UnorderedMapSlotMap.hpp src/ecs/SlotMap.hpp
+    src/Vector.hpp src/Math.hpp src/ecs/UnorderedMapSlotMap.hpp src/ecs/SlotMap.hpp
     tests/testVector.cpp tests/testMath.cpp tests/ecs/testUnorderedMapSlotMap.cpp
 )
 

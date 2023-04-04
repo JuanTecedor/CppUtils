@@ -18,7 +18,7 @@ TEST_CASE("Test UnorderedMapSlotMap") {
 
     for(const auto & e : map) {
     }
-    UnorderedMapSlotMap<int>::clear();
+    map.clear();
 }
 
 TEST_CASE("Test SlotMap") {
@@ -34,5 +34,5 @@ TEST_CASE("Test SlotMap") {
     intSlotMap.erase(id);
     REQUIRE(intSlotMap.size() == 0);
 
-    SlotMap_t::clear();
+    slotMap.clear();
 }
