@@ -25,20 +25,18 @@ public:
     constexpr Vector(U... ts) : m_data{ts...} {
     }
 
+    template <typename U>
+    constexpr Vector(const Vector<U, SIZE> & other) noexcept {
+        std::transform(other.begin(), other.end(), m_data.begin(), [](const auto & element){
+            return static_cast<T>(element);
+        });
+    }
+
     constexpr Vector(const Vector<value_type, SIZE> &) noexcept = default;
 
     constexpr Vector & operator=(const Vector<value_type, SIZE> &) noexcept = default;
 
     constexpr Vector & operator=(Vector<value_type, SIZE> && other) noexcept = default;
-
-    template<typename U>
-    constexpr static Vector fromCast(const Vector<U, SIZE> & other) noexcept {
-        Vector<T, SIZE> result;
-        std::transform(other.begin(), other.end(), result.begin(), [](const auto & element){
-            return static_cast<U>(element);
-        });
-        return result;
-    }
 
     template <typename U, typename S>
     [[nodiscard]] constexpr static Vector<T, 2> fromAngleAndLength(const U & angle, const S & scalar) noexcept {
@@ -58,10 +56,21 @@ public:
         return static_cast<U>(std::sqrt(lengthSquared()));
     }
 
+    constexpr bool is_null() const noexcept {
+        return std::all_of(m_data.begin(), m_data.end(), [](const auto & val){ return val == T{}; });
+    }
+
+    constexpr void normalize() noexcept {
+        if(!is_null())
+        {
+            *this /= length();
+        }
+    }
+
     [[nodiscard]] constexpr Vector<T, SIZE> normalized() const noexcept {
         Vector<T, SIZE> result = *this;
-        auto len = length();
-        return result / len;
+        result.normalize();
+        return result;
     }
 
     template <typename PRECISION = float>
@@ -71,10 +80,12 @@ public:
     }
 
     [[nodiscard]] constexpr const value_type & operator[](std::size_t i) const noexcept {
+        assert(i < SIZE);
         return m_data[i];
     }
 
     [[nodiscard]] constexpr value_type & operator[](std::size_t i) noexcept {
+        assert(i < SIZE);
         return m_data[i];
     }
 

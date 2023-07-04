@@ -17,7 +17,7 @@ TEST_CASE("Test Vector Constructors") {
     REQUIRE(Vector2i{1} == Vector2i{1, 1});
     REQUIRE(Vector2i(4) == Vector2i{4, 4});
     REQUIRE(Vector2i{v2} == v2);
-    REQUIRE(Vector2f::fromCast(v2) == Vector2f{2.f, 3.f});
+    REQUIRE(Vector2f(v2) == Vector2f{2.f, 3.f});
     REQUIRE(Vector2i::fromAngleAndLength(0, 1) == Vector2i{1, 0});
     REQUIRE(Vector2i::fromAngleAndLength(std::numbers::pi_v<float>, 1) == Vector2i{-1, 0});
     REQUIRE(Vector2i::fromAngleAndLength(std::numbers::pi_v<float> / 2, 1) == Vector2i{0, 1});
@@ -94,6 +94,15 @@ TEST_CASE("Test Vector Length Operations") {
     REQUIRE_THAT(normalized[0], WithinRel(0.2672612419124244f));
     REQUIRE_THAT(normalized[1], WithinRel(-0.5345224838248488f));
     REQUIRE_THAT(normalized[2], WithinRel(0.8017837257372731f));
+}
+
+TEST_CASE("Test Vector Null Length") {
+    using Catch::Matchers::WithinRel;
+    Vector2i v1{0, 0};
+    REQUIRE(v1.normalized() == Vector2i{0, 0});
+
+    Vector2f v2{0.f, 0.f};
+    REQUIRE(v2.normalized() == Vector2f{0.f, 0.f});
 }
 
 TEST_CASE("Test Vector Angle") {
