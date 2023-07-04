@@ -11,47 +11,47 @@ namespace juan
     {
     public:
         OstreamRedirector():
-                _pCout{nullptr}, _captured{}
+                m_p_cout{nullptr}, m_captured{}
         {
             start();
         }
 
         ~OstreamRedirector()
         {
-            assert(_pCout != nullptr);
-            if(_pCout != nullptr)
+            assert(m_p_cout != nullptr);
+            if(m_p_cout != nullptr)
             {
-                std::cout.rdbuf(_pCout);
+                std::cout.rdbuf(m_p_cout);
             }
         }
 
         void start()
         {
-            _pCout = std::cout.rdbuf(_captured.rdbuf());
+            m_p_cout = std::cout.rdbuf(m_captured.rdbuf());
         }
 
         void stop()
         {
-            assert(_pCout != nullptr);
-            if(_pCout != nullptr)
+            assert(m_p_cout != nullptr);
+            if(m_p_cout != nullptr)
             {
-                std::cout.rdbuf(_pCout);
+                std::cout.rdbuf(m_p_cout);
             }
         }
 
         std::string get()
         {
-            return _captured.str();
+            return m_captured.str();
         }
 
         void clear()
         {
-            _captured.str(std::string());
+            m_captured.str(std::string());
         }
 
     private:
-        std::streambuf * _pCout;
-        std::stringstream _captured;
+        std::streambuf * m_p_cout;
+        std::stringstream m_captured;
     };
 }
 
