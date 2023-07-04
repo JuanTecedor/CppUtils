@@ -10,8 +10,8 @@ namespace juan
     class OstreamRedirector
     {
     public:
-        OstreamRedirector():
-                m_p_cout{nullptr}, m_captured{}
+        OstreamRedirector(std::ostream & stream):
+                m_stream{stream}, m_p_cout{nullptr}, m_captured{}
         {
             start();
         }
@@ -21,13 +21,13 @@ namespace juan
             assert(m_p_cout != nullptr);
             if(m_p_cout != nullptr)
             {
-                std::cout.rdbuf(m_p_cout);
+                m_stream.rdbuf(m_p_cout);
             }
         }
 
         void start()
         {
-            m_p_cout = std::cout.rdbuf(m_captured.rdbuf());
+            m_p_cout = m_stream.rdbuf(m_captured.rdbuf());
         }
 
         void stop()
@@ -35,7 +35,7 @@ namespace juan
             assert(m_p_cout != nullptr);
             if(m_p_cout != nullptr)
             {
-                std::cout.rdbuf(m_p_cout);
+                m_stream.rdbuf(m_p_cout);
             }
         }
 
@@ -50,6 +50,7 @@ namespace juan
         }
 
     private:
+        std::ostream & m_stream;
         std::streambuf * m_p_cout;
         std::stringstream m_captured;
     };
