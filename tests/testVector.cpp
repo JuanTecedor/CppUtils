@@ -21,7 +21,6 @@ TEST_CASE("Test Vector Constructors") {
     REQUIRE(Vector2i::fromAngleAndLength(0, 1) == Vector2i{1, 0});
     REQUIRE(Vector2i::fromAngleAndLength(std::numbers::pi_v<float>, 1) == Vector2i{-1, 0});
     REQUIRE(Vector2i::fromAngleAndLength(std::numbers::pi_v<float> / 2, 1) == Vector2i{0, 1});
-    Vector2i a = Vector2i::fromAngleAndLength(std::numbers::pi_v<float> * (3.f / 2), 1);
     REQUIRE(Vector2i::fromAngleAndLength(std::numbers::pi_v<float> * (3.f / 2), 1) == Vector2i{0, -1});
 }
 

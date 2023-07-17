@@ -41,8 +41,8 @@ public:
     template <typename U, typename S>
     [[nodiscard]] constexpr static Vector<T, 2> fromAngleAndLength(const U & angle, const S & scalar) noexcept {
         return Vector<T, 2>{
-            static_cast<T>(std::cos(angle) * scalar),
-            static_cast<T>(std::sin(angle) * scalar)
+            static_cast<T>(std::cos(angle) * static_cast<U>(scalar)),
+            static_cast<T>(std::sin(angle) * static_cast<U>(scalar))
         };
     }
 
