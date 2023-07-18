@@ -48,6 +48,7 @@ target_compile_options(
     -Wduplicated-branches
     -Wlogical-op
     -Wuseless-cast
+    -O2  # Only for benchmarking
 )
 
 include(CTest)

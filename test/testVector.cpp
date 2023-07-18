@@ -110,3 +110,16 @@ TEST_CASE("Test Vector Angle") {
     Vector3f v2{6.f, 6.f, -1.f};
     REQUIRE_THAT(v1.angle(v2), WithinRel(std::numbers::pi_v<float> / 4, .01f));
 }
+
+#include <catch2/benchmark/catch_benchmark.hpp>
+
+TEST_CASE("Benchmark Vector [!benchmark]") {
+    BENCHMARK("Benchmark Vector3i") {
+        constexpr Vector3f a{0.123f, 124.12f, 12.124f};
+        Vector3f b{2121.2f, 70.0f, 112.9f};
+        b.normalize();
+        b = -b;
+        auto c = b / 1.2f;
+        return a * b * c;
+    };
+}

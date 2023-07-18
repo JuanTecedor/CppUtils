@@ -34,6 +34,12 @@ v4 /= -2;
 v4 == Vector2i{-4, 5};  // true
 ```
 
+There are currently two implementations of the vector:
+* Vector: Based in a std::array
+* VectorTuple: Based in a std::tuple
+
+The results at different optimization levels can be seen in Results.txt.
+
 ## Ostream redirector
 
 Redirects the std::cout output to an internal stringstream. Normally used to test the output of another module.
