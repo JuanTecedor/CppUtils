@@ -31,28 +31,58 @@ consteval auto createTupleWithSameValue(const T& value) {
 }
 
 template <typename... Ts>
-auto makeTupleFromParameters(Ts&&... args) {
+consteval auto makeTupleFromParameters(Ts&&... args) {
     return std::make_tuple(std::forward<Ts>(args)...);
 }
 
 template <typename Tuple1, typename Tuple2, std::size_t... Indices, typename BinaryOp>
-auto tupleElementWiseOpHelper(const Tuple1& t1, const Tuple2& t2, std::index_sequence<Indices...>, BinaryOp op) {
+constexpr auto tupleElementWiseOpHelper(const Tuple1& t1, const Tuple2& t2, std::index_sequence<Indices...>, BinaryOp op) {
     return std::make_tuple(op(std::get<Indices>(t1), std::get<Indices>(t2))...);
 }
 
 template <typename Tuple1, typename Tuple2, typename BinaryOp>
-auto tupleElementWiseOp(const Tuple1& t1, const Tuple2& t2, BinaryOp op) {
+constexpr auto tupleElementWiseOp(const Tuple1& t1, const Tuple2& t2, BinaryOp op) {
     return tupleElementWiseOpHelper(t1, t2, std::make_index_sequence<std::tuple_size_v<Tuple1>>(), op);
 }
 
 template <typename TUPLE, std::size_t... Indices, typename BinaryOp, typename T>
-auto tupleBinaryOpHelper(const TUPLE& tuple, std::index_sequence<Indices...>, BinaryOp op, const T & scalar) {
+constexpr auto tupleBinaryOpHelper(const TUPLE& tuple, std::index_sequence<Indices...>, BinaryOp op, const T & scalar) {
     return std::make_tuple(op(std::get<Indices>(tuple), scalar)...);
 }
 
 template <typename TUPLE, typename BinaryOp, typename T>
-TUPLE tupleBinaryOp(const TUPLE& tuple, BinaryOp op, const T & scalar) {
+constexpr TUPLE tupleBinaryOp(const TUPLE& tuple, BinaryOp op, const T & scalar) {
     return tupleBinaryOpHelper(tuple, std::make_index_sequence<std::tuple_size_v<TUPLE>>(), op, scalar);
+}
+
+template <typename TUPLE, std::size_t... Indices, typename UnaryOp>
+constexpr auto tupleUnaryOpHelper(const TUPLE& tuple, std::index_sequence<Indices...>, UnaryOp op) {
+    return std::make_tuple(op(std::get<Indices>(tuple))...);
+}
+
+template <typename TUPLE, typename UnaryOp>
+constexpr TUPLE tupleUnaryOp(const TUPLE& tuple, UnaryOp op) {
+    return tupleUnaryOpHelper(tuple, std::make_index_sequence<std::tuple_size_v<TUPLE>>(), op);
+}
+
+template <std::size_t Index, typename Tuple1, typename Tuple2>
+std::enable_if_t<Index == 0, decltype(std::get<0>(std::declval<Tuple1>()) * std::get<0>(std::declval<Tuple2>()))>
+tupleDotProductHelper(const Tuple1&, const Tuple2&) {
+    return decltype(std::get<0>(std::declval<Tuple1>()) * std::get<0>(std::declval<Tuple2>()))(0);
+}
+
+template <std::size_t Index, typename Tuple1, typename Tuple2>
+std::enable_if_t<Index != 0, decltype(std::get<0>(std::declval<Tuple1>()) * std::get<0>(std::declval<Tuple2>()))>
+tupleDotProductHelper(const Tuple1& t1, const Tuple2& t2) {
+    auto tail = tupleDotProductHelper<Index - 1>(t1, t2);
+    auto product = std::get<Index - 1>(t1) * std::get<Index - 1>(t2);
+    return tail + product;
+}
+
+template <typename... Args1, typename... Args2>
+auto tupleDotProduct(const std::tuple<Args1...>& t1, const std::tuple<Args2...>& t2) {
+    static_assert(sizeof...(Args1) == sizeof...(Args2), "Tuples must have the same size.");
+    return tupleDotProductHelper<sizeof...(Args1)>(t1, t2);
 }
 
 template<typename T, std::size_t SIZE> requires (SIZE > 0)
@@ -160,7 +190,7 @@ public:
 
     [[nodiscard]] constexpr VectorTuple<T, SIZE> operator-() const noexcept {
         VectorTuple<T, SIZE> result;
-        // std::transform(begin(), end(), result.begin(), std::negate<T>());
+        result.m_data = tupleUnaryOp(m_data, std::negate<>());
         return result;
     }
 
@@ -172,8 +202,7 @@ public:
     }
 
     [[nodiscard]] constexpr T operator*(const VectorTuple<T, SIZE> & rhs) const noexcept {
-        // return std::inner_product(begin(), end(), rhs.begin(), T{});
-        return {};
+        return tupleDotProduct(m_data, rhs.m_data);
     }
 
     template <typename U>
@@ -184,12 +213,12 @@ public:
     }
 
     constexpr VectorTuple<T, SIZE> operator+=(const VectorTuple<T, SIZE> & rhs) noexcept {
-        // std::transform(begin(), end(), rhs.begin(), begin(), std::plus<T>());
+        m_data = tupleElementWiseOp(m_data, rhs.m_data, std::plus());
         return *this;
     }
 
     constexpr VectorTuple<T, SIZE> operator-=(const VectorTuple<T, SIZE> & rhs) noexcept {
-        // std::transform(begin(), end(), rhs.begin(), begin(), std::minus<T>());
+        m_data = tupleElementWiseOp(m_data, rhs.m_data, std::minus());
         return *this;
     }
 

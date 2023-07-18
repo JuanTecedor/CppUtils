@@ -55,65 +55,65 @@ TEST_CASE("Test VectorTuple Binary Operators") {
     REQUIRE(result == VectorTuple2i{-3, 1});
 }
 
-// TEST_CASE("Test VectorTuple Dot Product") {
-//     Vector2i v1{1, -7};
-//     Vector2i v2{-9, 13};
-//     REQUIRE((v1 * v2) == -100);
-//     REQUIRE((v1 * v2) == (v2 * v1));
-// }
+TEST_CASE("Test VectorTuple Dot Product") {
+    VectorTuple2i v1{1, -7};
+    VectorTuple2i v2{-9, 13};
+    REQUIRE((v1 * v2) == -100);
+    REQUIRE((v1 * v2) == (v2 * v1));
+}
 
-// TEST_CASE("Test VectorTuple Unary Operators") {
-//     REQUIRE(-Vector2i{1, -2} == Vector2i{-1, 2});
-// }
+TEST_CASE("Test VectorTuple Unary Operators") {
+    REQUIRE(-VectorTuple2i{1, -2} == VectorTuple2i{-1, 2});
+}
 
-// TEST_CASE("Test VectorTuple Assignment Operators") {
-//     Vector2i v1{1, -5};
-//     Vector2i v2{-3, 7};
+TEST_CASE("Test VectorTuple Assignment Operators") {
+    VectorTuple2i v1{1, -5};
+    VectorTuple2i v2{-3, 7};
 
-//     v1 -= v2;
-//     REQUIRE(v1 == Vector2i{4, -12});
-//     v2 += v1;
-//     REQUIRE(v2 == Vector2i{1, -5});
+    v1 -= v2;
+    REQUIRE(v1 == VectorTuple2i{4, -12});
+    v2 += v1;
+    REQUIRE(v2 == VectorTuple2i{1, -5});
 
-//     Vector2i v3{2, -3};
-//     v3 *= -2;
-//     REQUIRE(v3 == Vector2i{-4, 6});
+    VectorTuple2i v3{2, -3};
+    v3 *= -2;
+    REQUIRE(v3 == VectorTuple2i{-4, 6});
 
-//     Vector2i v4{8, -10};
-//     v4 /= -2;
-//     REQUIRE(v4 == Vector2i{-4, 5});
-// }
+    VectorTuple2i v4{8, -10};
+    v4 /= -2;
+    REQUIRE(v4 == VectorTuple2i{-4, 5});
+}
 
-// TEST_CASE("Test VectorTuple Length Operations") {
-//     using Catch::Matchers::WithinRel;
-//     Vector2i v1{5, 1};
-//     REQUIRE(v1.lengthSquared() == 26);
-//     REQUIRE(v1.length() == 5);
+TEST_CASE("Test VectorTuple Length Operations") {
+    using Catch::Matchers::WithinRel;
+    VectorTuple2i v1{5, 1};
+    REQUIRE(v1.lengthSquared() == 26);
+    REQUIRE(v1.length() == 5);
 
-//     Vector3i v2{5, 1, -6};
-//     REQUIRE(v2.lengthSquared() == 62);
-//     REQUIRE(v2.length() == 7);
+    VectorTuple3i v2{5, 1, -6};
+    REQUIRE(v2.lengthSquared() == 62);
+    REQUIRE(v2.length() == 7);
 
-//     Vector3f v3{10.f, -20.f, 30.f};
-//     Vector3f normalized = v3.normalized();
-//     REQUIRE_THAT(normalized.length(), WithinRel(1.f));
-//     REQUIRE_THAT(normalized.get<0>(), WithinRel(0.2672612419124244f));
-//     REQUIRE_THAT(normalized.get<1>(), WithinRel(-0.5345224838248488f));
-//     REQUIRE_THAT(normalized.get<2>(), WithinRel(0.8017837257372731f));
-// }
+    VectorTuple3f v3{10.f, -20.f, 30.f};
+    VectorTuple3f normalized = v3.normalized();
+    REQUIRE_THAT(normalized.length(), WithinRel(1.f));
+    REQUIRE_THAT(normalized.get<0>(), WithinRel(0.2672612419124244f));
+    REQUIRE_THAT(normalized.get<1>(), WithinRel(-0.5345224838248488f));
+    REQUIRE_THAT(normalized.get<2>(), WithinRel(0.8017837257372731f));
+}
 
-// TEST_CASE("Test VectorTuple Null Length") {
-//     using Catch::Matchers::WithinRel;
-//     Vector2i v1{0, 0};
-//     REQUIRE(v1.normalized() == Vector2i{0, 0});
+TEST_CASE("Test VectorTuple Null Length") {
+    using Catch::Matchers::WithinRel;
+    VectorTuple2i v1{0, 0};
+    REQUIRE(v1.normalized() == VectorTuple2i{0, 0});
 
-//     Vector2f v2{0.f, 0.f};
-//     REQUIRE(v2.normalized() == Vector2f{0.f, 0.f});
-// }
+    VectorTuple2f v2{0.f, 0.f};
+    REQUIRE(v2.normalized() == VectorTuple2f{0.f, 0.f});
+}
 
-// TEST_CASE("Test VectorTuple Angle") {
-//     using Catch::Matchers::WithinRel;
-//     Vector3f v1{3.f, 0.f, -1.f};
-//     Vector3f v2{6.f, 6.f, -1.f};
-//     REQUIRE_THAT(v1.angle(v2), WithinRel(std::numbers::pi_v<float> / 4, .01f));
-// }
+TEST_CASE("Test VectorTuple Angle") {
+    using Catch::Matchers::WithinRel;
+    VectorTuple3f v1{3.f, 0.f, -1.f};
+    VectorTuple3f v2{6.f, 6.f, -1.f};
+    REQUIRE_THAT(v1.angle(v2), WithinRel(std::numbers::pi_v<float> / 4, .01f));
+}
