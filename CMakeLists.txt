@@ -16,6 +16,7 @@ add_executable(
     src/Vector.hpp
     test/testVector.cpp
     src/VectorTuple.hpp
+    src/VectorTupleHelpers.hpp
     test/testVectorTuple.cpp
     src/OstreamRedirector.hpp
     test/testOstreamRedirector.cpp

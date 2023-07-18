@@ -39,6 +39,13 @@ TEST_CASE("Test VectorTuple Boolean Operators") {
     REQUIRE(v3 != v1);
 }
 
+TEST_CASE("Test VectorTuple Get") {
+    VectorTuple2i v1{4, 2};
+    v1.get<0>() = 10;
+    v1.get<1>() = -1;
+    REQUIRE(v1 == VectorTuple2i{10, -1});
+}
+
 TEST_CASE("Test VectorTuple Binary Operators") {
     VectorTuple2i v1{1, 2};
     VectorTuple2i v2{-3, 4};
