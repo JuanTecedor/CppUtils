@@ -10,7 +10,7 @@ TEST_CASE("Test Ostream") {
         ss << "a";
         auto os_redir = juan::OstreamRedirector(ss);
         ss << "b";
-        auto c = os_redir.get();
+        auto capture = os_redir.get();
         REQUIRE(os_redir.get() == "b");
     }
     ss << "c";
