@@ -40,14 +40,23 @@ auto tupleElementWiseOpHelper(const Tuple1& t1, const Tuple2& t2, std::index_seq
     return std::make_tuple(op(std::get<Indices>(t1), std::get<Indices>(t2))...);
 }
 
-// Function to perform element-wise operation on tuples
 template <typename Tuple1, typename Tuple2, typename BinaryOp>
 auto tupleElementWiseOp(const Tuple1& t1, const Tuple2& t2, BinaryOp op) {
     return tupleElementWiseOpHelper(t1, t2, std::make_index_sequence<std::tuple_size_v<Tuple1>>(), op);
 }
 
+template <typename TUPLE, std::size_t... Indices, typename BinaryOp, typename T>
+auto tupleBinaryOpHelper(const TUPLE& tuple, std::index_sequence<Indices...>, BinaryOp op, const T & scalar) {
+    return std::make_tuple(op(std::get<Indices>(tuple), scalar)...);
+}
+
+template <typename TUPLE, typename BinaryOp, typename T>
+TUPLE tupleBinaryOp(const TUPLE& tuple, BinaryOp op, const T & scalar) {
+    return tupleBinaryOpHelper(tuple, std::make_index_sequence<std::tuple_size_v<TUPLE>>(), op, scalar);
+}
+
 template<typename T, std::size_t SIZE> requires (SIZE > 0)
-class Vector {
+class VectorTuple {
 private:
     using tuple_type = typename TupleOfN<T, SIZE>::type;
     tuple_type m_data;
@@ -58,30 +67,30 @@ public:
     using const_iterator = const value_type *;
 
     template <typename... ARGS, typename = std::enable_if_t<std::conjunction_v<std::is_same<T, std::decay_t<ARGS>>...>>>
-    consteval Vector(ARGS&&... args) : m_data(std::forward<ARGS>(args)...) {}
+    consteval VectorTuple(ARGS&&... args) : m_data(std::forward<ARGS>(args)...) {}
 
     template <T VALUE>
-    [[nodiscard]] consteval static Vector from_val() noexcept {
-        Vector<T, SIZE> ret;
+    [[nodiscard]] consteval static VectorTuple from_val() noexcept {
+        VectorTuple<T, SIZE> ret;
         ret.m_data = createTupleWithSameValue<T, SIZE>(VALUE);
         return ret;
     }
 
     template <typename U>
-    [[nodiscard]] constexpr Vector(const Vector<U, SIZE> & other) noexcept : m_data{other.m_data} { }
+    [[nodiscard]] constexpr VectorTuple(const VectorTuple<U, SIZE> & other) noexcept : m_data{other.m_data} { }
 
     template <typename U, std::size_t S>
-    friend class Vector;
+    friend class VectorTuple;
 
-    // constexpr Vector(const Vector<value_type, SIZE> &) noexcept = default;
+    // constexpr VectorTuple(const VectorTuple<value_type, SIZE> &) noexcept = default;
 
-    // constexpr Vector & operator=(const Vector<value_type, SIZE> &) noexcept = default;
+    // constexpr VectorTuple & operator=(const VectorTuple<value_type, SIZE> &) noexcept = default;
 
-    // constexpr Vector & operator=(Vector<value_type, SIZE> && other) noexcept = default;
+    // constexpr VectorTuple & operator=(VectorTuple<value_type, SIZE> && other) noexcept = default;
 
     template <typename U, typename S>
-    [[nodiscard]] consteval static Vector fromAngleAndLength(const U & angle, const S & scalar) noexcept {
-        return Vector<T, 2>{
+    [[nodiscard]] consteval static VectorTuple fromAngleAndLength(const U & angle, const S & scalar) noexcept {
+        return VectorTuple<T, 2>{
             static_cast<T>(std::cos(angle) * static_cast<U>(scalar)),
             static_cast<T>(std::sin(angle) * static_cast<U>(scalar))
         };
@@ -113,14 +122,14 @@ public:
         }
     }
 
-    [[nodiscard]] constexpr Vector<T, SIZE> normalized() const noexcept {
-        Vector<T, SIZE> result = *this;
+    [[nodiscard]] constexpr VectorTuple<T, SIZE> normalized() const noexcept {
+        VectorTuple<T, SIZE> result = *this;
         result.normalize();
         return result;
     }
 
     template <typename PRECISION = float>
-    [[nodiscard]] constexpr PRECISION angle(const Vector<T, SIZE> & other) const noexcept {
+    [[nodiscard]] constexpr PRECISION angle(const VectorTuple<T, SIZE> & other) const noexcept {
         auto dot = *this * other;
         return static_cast<PRECISION>(std::acos(dot / (length() * other.length())));
     }
@@ -137,96 +146,92 @@ public:
         return std::get<IDX>(m_data);
     }
 
-    [[nodiscard]] constexpr Vector<T, SIZE> operator+(const Vector<T, SIZE> & rhs) const noexcept {
-        Vector<T, SIZE> result;
+    [[nodiscard]] constexpr VectorTuple<T, SIZE> operator+(const VectorTuple<T, SIZE> & rhs) const noexcept {
+        VectorTuple<T, SIZE> result;
         result.m_data = tupleElementWiseOp(m_data, rhs.m_data, std::plus());
         return result;
     }
 
-    [[nodiscard]] constexpr Vector<T, SIZE> operator-(const Vector<T, SIZE> & rhs) const noexcept {
-        Vector<T, SIZE> result;
+    [[nodiscard]] constexpr VectorTuple<T, SIZE> operator-(const VectorTuple<T, SIZE> & rhs) const noexcept {
+        VectorTuple<T, SIZE> result;
         result.m_data = tupleElementWiseOp(m_data, rhs.m_data, std::minus());
         return result;
     }
 
-    [[nodiscard]] constexpr Vector<T, SIZE> operator-() const noexcept {
-        Vector<T, SIZE> result;
+    [[nodiscard]] constexpr VectorTuple<T, SIZE> operator-() const noexcept {
+        VectorTuple<T, SIZE> result;
         // std::transform(begin(), end(), result.begin(), std::negate<T>());
         return result;
     }
 
     template <typename U> requires (std::integral<U> or std::floating_point<U>)
-    [[nodiscard]] constexpr Vector<T, SIZE> operator*(const U & scalar) const noexcept {
-        Vector<T, SIZE> result;
-        // std::transform(begin(), end(), result.begin(), [scalar](const auto & element){
-        //     return element * scalar;
-        // });
+    [[nodiscard]] constexpr VectorTuple<T, SIZE> operator*(const U & scalar) const noexcept {
+        VectorTuple<T, SIZE> result;
+        result.m_data = tupleBinaryOp(m_data, std::multiplies<>(), scalar);
         return result;
     }
 
-    [[nodiscard]] constexpr T operator*(const Vector<T, SIZE> & rhs) const noexcept {
+    [[nodiscard]] constexpr T operator*(const VectorTuple<T, SIZE> & rhs) const noexcept {
         // return std::inner_product(begin(), end(), rhs.begin(), T{});
         return {};
     }
 
     template <typename U>
-    [[nodiscard]] constexpr Vector<T, SIZE> operator/(const U & scalar) const noexcept {
-        Vector<T, SIZE> result;
-        // std::transform(begin(), end(), result.begin(), [scalar](const auto & element){
-        //     return element / scalar;
-        // });
+    [[nodiscard]] constexpr VectorTuple<T, SIZE> operator/(const U & scalar) const noexcept {
+        VectorTuple<T, SIZE> result;
+        result.m_data = tupleBinaryOp(m_data, std::divides<>(), scalar);
         return result;
     }
 
-    constexpr Vector<T, SIZE> operator+=(const Vector<T, SIZE> & rhs) noexcept {
+    constexpr VectorTuple<T, SIZE> operator+=(const VectorTuple<T, SIZE> & rhs) noexcept {
         // std::transform(begin(), end(), rhs.begin(), begin(), std::plus<T>());
         return *this;
     }
 
-    constexpr Vector<T, SIZE> operator-=(const Vector<T, SIZE> & rhs) noexcept {
+    constexpr VectorTuple<T, SIZE> operator-=(const VectorTuple<T, SIZE> & rhs) noexcept {
         // std::transform(begin(), end(), rhs.begin(), begin(), std::minus<T>());
         return *this;
     }
 
     template <typename U>
-    constexpr Vector<T, SIZE> operator*=(const U & scalar) noexcept {
+    constexpr VectorTuple<T, SIZE> operator*=(const U & scalar) noexcept {
         *this = *this * scalar;
         return *this;
     }
 
     template <typename U>
-    constexpr Vector<T, SIZE> operator/=(const U & scalar) noexcept {
+    constexpr VectorTuple<T, SIZE> operator/=(const U & scalar) noexcept {
         *this = *this / scalar;
         return *this;
     }
 
-    [[nodiscard]] constexpr auto operator<=>(const Vector<T, SIZE>&) const = default;
+    [[nodiscard]] constexpr auto operator<=>(const VectorTuple<T, SIZE>&) const = default;
 };
 
 template <typename T, std::size_t SIZE>
-constexpr Vector<T, SIZE> operator*(const T & scalar, const Vector<T, SIZE> & rhs) noexcept
+constexpr VectorTuple<T, SIZE> operator*(const T & scalar, const VectorTuple<T, SIZE> & rhs) noexcept
 {
     return rhs * scalar;
 }
 
 template <typename T, std::size_t SIZE>
-constexpr Vector<T, SIZE> operator/(const T & scalar, const Vector<T, SIZE> & rhs) noexcept
+constexpr VectorTuple<T, SIZE> operator/(const T & scalar, const VectorTuple<T, SIZE> & rhs) noexcept
 {
     return scalar / rhs;
 }
 
 template <typename T>
-using Vector2 = Vector<T, 2>;
+using VectorTuple2 = VectorTuple<T, 2>;
 
 template <typename T>
-using Vector3 = Vector<T, 3>;
+using VectorTuple3 = VectorTuple<T, 3>;
 
-using Vector2i = Vector2<int>;
-using Vector2u = Vector2<unsigned int>;
-using Vector2f = Vector2<float>;
+using VectorTuple2i = VectorTuple2<int>;
+using VectorTuple2u = VectorTuple2<unsigned int>;
+using VectorTuple2f = VectorTuple2<float>;
 
-using Vector3i = Vector3<int>;
-using Vector3u = Vector3<unsigned int>;
-using Vector3f = Vector3<float>;
+using VectorTuple3i = VectorTuple3<int>;
+using VectorTuple3u = VectorTuple3<unsigned int>;
+using VectorTuple3f = VectorTuple3<float>;
 
 #endif // VECTOR_HPP
