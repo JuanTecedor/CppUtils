@@ -8,7 +8,6 @@
 #include <numeric>
 #include <tuple>
 #include <utility>
-#include <iostream> // TODO remove
 
 template <typename T, std::size_t N>
 struct TupleOfN {
@@ -112,12 +111,6 @@ public:
     template <typename U, std::size_t S>
     friend class VectorTuple;
 
-    // constexpr VectorTuple(const VectorTuple<value_type, SIZE> &) noexcept = default;
-
-    // constexpr VectorTuple & operator=(const VectorTuple<value_type, SIZE> &) noexcept = default;
-
-    // constexpr VectorTuple & operator=(VectorTuple<value_type, SIZE> && other) noexcept = default;
-
     template <typename U, typename S>
     [[nodiscard]] consteval static VectorTuple fromAngleAndLength(const U & angle, const S & scalar) noexcept {
         return VectorTuple<T, 2>{
@@ -128,7 +121,6 @@ public:
 
     template <typename U = value_type>
     [[nodiscard]] constexpr U lengthSquared() const noexcept {
-        // return std::inner_product(begin(), end(), begin(), T{});
         return std::apply([](const auto & ... args){
             return ((args * args) + ...);
         }, m_data);
