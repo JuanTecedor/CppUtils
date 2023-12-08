@@ -10,8 +10,8 @@ namespace juan
     class OstreamRedirector
     {
     public:
-        OstreamRedirector(std::ostream & stream):
-                m_stream{stream}, m_p_cout{nullptr}, m_captured{}
+        explicit OstreamRedirector(std::ostream & stream):
+            m_stream{stream}
         {
             start();
         }
@@ -24,6 +24,11 @@ namespace juan
                 m_stream.rdbuf(m_p_cout);
             }
         }
+
+        OstreamRedirector(OstreamRedirector&) = delete;
+        OstreamRedirector(OstreamRedirector&&) = delete;
+        OstreamRedirector operator=(OstreamRedirector) = delete;
+        OstreamRedirector& operator=(OstreamRedirector&&) = delete;
 
         void start()
         {
@@ -39,7 +44,7 @@ namespace juan
             }
         }
 
-        std::string get()
+        std::string get() const
         {
             return m_captured.str();
         }
@@ -51,7 +56,7 @@ namespace juan
 
     private:
         std::ostream & m_stream;
-        std::streambuf * m_p_cout;
+        std::streambuf * m_p_cout = {nullptr};
         std::stringstream m_captured;
     };
 }
